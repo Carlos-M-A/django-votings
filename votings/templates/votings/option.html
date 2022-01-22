@@ -1,0 +1,7 @@
+{% if option %}
+    {{option.index_number}}<p>
+    {{option.title_text}}<p>
+    {{option.voting.question_text}}<p>
+{% else %}
+    <p> option is NOT available.</p>
+{% endif %}

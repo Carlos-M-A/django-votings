@@ -1,0 +1,17 @@
+<html>
+<head>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'votings/style.css' %}">
+</head>
+<body>
+{% if voting_list %}
+    <ul>
+    {% for voting in voting_list %}
+        <li><a href="{% url 'votings:voting' voting.id %}">{{ voting.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No votings are available.</p>
+{% endif %}
+</body>
+</html>

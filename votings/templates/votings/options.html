@@ -1,0 +1,16 @@
+{% if options_list %}
+<ul>
+    {% for option in options_list %}
+        <li>{{option.index_number}}  {{ option.title_text }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p> option is NOT available.</p>
+{% endif %}
+<p>
+
+<form action="{% url 'votings:options' voting_id %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="answer" id="answer">
+    <input type="submit" value="New option">
+</form>
