@@ -1,5 +1,6 @@
-# django-votings
-
+=====
+Votings
+=====
 
 Votings is a Django app to conduct web-based votings. For each voting,
 voters can choose between a fixed number of options.
