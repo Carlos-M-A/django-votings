@@ -29,7 +29,7 @@ class Membership(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return str(self.start_date) + ' - ' + str(self.end_date)
+        return str(self.start_date) + ' ----- ' + str(self.end_date)
 
 
 class Voting(models.Model):
@@ -79,14 +79,20 @@ class PublicVote(models.Model):
     option = models.ForeignKey(Option, on_delete=models.RESTRICT, null=True, blank=True)
 
     def __str__(self):
-        return str(self.user.id) +': ' + str(self.option.index_number)
+        if self.option == None:
+            return str(self.user.id) + ': 0'
+        else:
+            return str(self.user.id) + ': ' + str(self.option.index_number)
 
 
 class AnonymousVote(models.Model):
     option = models.ForeignKey(Option, on_delete=models.RESTRICT, null=True, blank=True)
 
     def __str__(self):
-        return str(self.id) +': ' + str(self.option.index_number)
+        if self.option == None:
+            return str(self.id) + ': 0'
+        else:
+            return str(self.id) + ': ' + str(self.option.index_number)
 
 
 class Participation(models.Model):
@@ -95,13 +101,13 @@ class Participation(models.Model):
     participation_check = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.user.id + ': ' + str(self.participation_check))
+        return str(self.user.id) + ': ' + str(self.participation_check)
 
 
 class Tag(models.Model):
     name_text = models.CharField(max_length=128)
     group_of_voters = models.ForeignKey(GroupOfVoters, on_delete=models.RESTRICT)
-    voting = models.ManyToManyField(Voting)
+    voting = models.ManyToManyField(Voting, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
