@@ -22,7 +22,7 @@ Quick start
 
     path('', include('votings.urls')),
 
-3. Run  ``python manage.py migrate`` and ``python manage.py migrate`` to create the votings models.
+3. Run  ``python manage.py makemigrations`` and ``python manage.py migrate`` to create the votings models.
 
 4. Start the development server and visit http://127.0.0.1:8000/admin/
    to create a votings (you'll need the Admin app enabled).
