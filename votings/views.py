@@ -7,14 +7,17 @@ from django.urls import reverse
 from django.views import generic
 from .models import Option, Voting
 
-def index(request):
+def voting_index(request):
     voting_list = Voting.objects.all()
     context = {
         'voting_list':voting_list,
     }
     return render(request, 'votings/index.html', context)
 
-def voting(request, voting_id):
+def voting_create(request):
+    pass
+
+def voting_show(request, voting_id):
     try:
         voting = Voting.objects.get(pk=voting_id)
         context = {
@@ -23,6 +26,21 @@ def voting(request, voting_id):
     except Voting.DoesNotExist:
         raise Http404('Voting does not exist')
     return render(request, 'votings/voting.html', context)
+
+def voting_edit(request, voting_id):
+    pass
+
+def voting_delete(request, voting_id):
+    pass
+
+def options_create(request, voting_id):
+    pass
+
+def options_edit(request, voting_id, option_id):
+    pass
+
+def options_delete(request, voting_id, option_id):
+    pass
 
 def options(request, voting_id):
     if request.method == 'POST':
