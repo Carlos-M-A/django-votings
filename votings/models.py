@@ -38,8 +38,8 @@ class Voting(models.Model):
     explanation_text = models.TextField(max_length=512, blank=True)
     assembly = models.ForeignKey(Assembly, on_delete=models.RESTRICT)
     are_votes_anonymous = models.BooleanField(default=False)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
     electorate_quantity = models.PositiveIntegerField(null=True, blank=True)
     votes_quantity = models.PositiveIntegerField(null=True, blank=True)
     state = models.PositiveSmallIntegerField()
@@ -62,7 +62,7 @@ class Voting(models.Model):
 
 
 class Option(models.Model):
-    index_number = models.IntegerField()
+    index_number = models.IntegerField(null=True, blank=True)
     title_text = models.CharField(max_length=128)
     explanation_text = models.TextField(max_length=512, blank=True)
     votes_quantity = models.PositiveIntegerField(null=True, blank=True)

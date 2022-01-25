@@ -7,11 +7,13 @@
 {% if voting_list %}
     <ul>
     {% for voting in voting_list %}
-        <li><a href="{% url 'votings:voting' voting.id %}">{{ voting.question_text }}</a></li>
+        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting.question_text }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
     <p>No votings are available.</p>
 {% endif %}
+<p>
+    <a href="{% url 'votings:votings_create' %}">Add new voting </a>
 </body>
 </html>
