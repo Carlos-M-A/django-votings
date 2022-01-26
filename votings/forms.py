@@ -7,7 +7,6 @@ class VotingForm(forms.ModelForm):
         fields = (  'title_text', 
                     'question_text',
                     'explanation_text',
-                    'assembly',
                     'are_votes_anonymous')
 
 class VotingDatesForm(forms.ModelForm):

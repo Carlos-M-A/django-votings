@@ -5,8 +5,24 @@ from django.template import loader
 from django.http import Http404
 from django.urls import reverse
 from django.views import generic
-from .models import Option, Voting, VotingStates
+from .models import Assembly, Option, Voting, VotingStates
 from .forms import OptionForm, VotingForm
+
+def general_index(request, general_assembly_id):
+    general_assembly = get_object_or_404(Assembly, pk=general_assembly_id)
+    assemblies = general_assembly.assembly_set.all()
+    context = {
+        'general_assembly':general_assembly,
+        'assemblies':assemblies
+    }
+    return render(request, 'votings/general_index.html', context)
+    
+def assemblies_show(request, assembly_id):
+    assembly = get_object_or_404(Assembly, pk=assembly_id)
+    context = {
+        'assembly':assembly,
+    }
+    return render(request, 'votings/assemblies_show.html', context)
 
 def votings_index(request):
     voting_list = Voting.objects.all()
@@ -15,11 +31,13 @@ def votings_index(request):
     }
     return render(request, 'votings/votings_index.html', context)
 
-def votings_create(request):
+def votings_create(request, assembly_id):
+    assembly = get_object_or_404(Assembly, pk=assembly_id)
     if request.method == "POST":
         form = VotingForm(request.POST)
         if form.is_valid():
             voting = form.save(commit=False)
+            voting.assembly = assembly
             voting.electorate_quantity = 0
             voting.votes_quantity = 0
             voting.state = VotingStates.EDITABLE
@@ -27,7 +45,12 @@ def votings_create(request):
             return redirect('votings:votings_show', voting_id=voting.id)
     else:
         form = VotingForm()
-    return render(request, 'votings/votings_create.html', {'form': form})
+    context = {
+        'form':form,
+        'assembly':assembly
+    }
+    return render(request, 'votings/votings_create.html', context)
+    
 
 def votings_show(request, voting_id):
     try:
