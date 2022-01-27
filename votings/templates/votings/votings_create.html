@@ -1,8 +1,12 @@
-{% block content %}
+{% extends "base.html" %}
+
+{% block page_content %}
+
     <h2>New voting for  {{assembly.name_text}} </h2>
     <form method="POST" class="post-form">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="save btn btn-default">Save</button>
     </form>
+    
 {% endblock %}

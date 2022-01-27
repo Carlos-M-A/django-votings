@@ -1,9 +1,7 @@
-<html>
-<head>
-{% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'votings/style.css' %}">
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block page_content %}
+
 {% if voting_list %}
     <ul>
     {% for voting in voting_list %}
@@ -15,5 +13,4 @@
 {% endif %}
 <p>
 
-</body>
-</html>
+{% endblock %}

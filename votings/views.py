@@ -16,7 +16,7 @@ def general_index(request, general_assembly_id):
         'assemblies':assemblies
     }
     return render(request, 'votings/general_index.html', context)
-    
+
 def assemblies_show(request, assembly_id):
     assembly = get_object_or_404(Assembly, pk=assembly_id)
     context = {
@@ -50,7 +50,6 @@ def votings_create(request, assembly_id):
         'assembly':assembly
     }
     return render(request, 'votings/votings_create.html', context)
-    
 
 def votings_show(request, voting_id):
     try:
@@ -107,15 +106,3 @@ def options_delete(request, voting_id, option_id):
     option = get_object_or_404(Option, pk=option_id)
     option.delete()
     return redirect('votings:votings_show', voting_id=option.voting.id)
-
-def options(request, voting_id):
-    if request.method == 'POST':
-        voting = Voting.objects.get(pk=voting_id)
-        new_option = Option(index_number=1, title_text=request.POST['answer'], voting=voting)
-        new_option.save()
-        #options_list = Option.objects.filter(voting_id=voting_id)
-        #return render(request, 'votings/option.html', {'options_list':options_list, 'voting_id':voting_id})
-        return HttpResponseRedirect(reverse('votings:options', args=(voting.id,)))
-    else:
-        options_list = Option.objects.filter(voting_id=voting_id)
-        return render(request, 'votings/options.html', {'options_list':options_list, 'voting_id':voting_id})
