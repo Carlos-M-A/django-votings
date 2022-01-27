@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+
+<p> {{assembly.name_text}} </p>
+<p> {{assembly.description_text}} </p>
+<p> {{assembly.is_general}} </p>
+<p> {{assembly.general_assembly}} </p>
+<p> {{assembly.manager}} </p>
+<p> {{assembly.created_date}} </p>
+<p> {{assembly.updated_date}} </p>
+
+<a href="{% url 'votings:votings_create' assembly.id %}">Add new voting </a>
+
+{% endblock %}
