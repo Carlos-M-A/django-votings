@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+{% if voting_list %}
+    <ul>
+    {% for voting in voting_list %}
+        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No votings are available.</p>
+{% endif %}
+<p>
+
+{% endblock %}

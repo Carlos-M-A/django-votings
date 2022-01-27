@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+
+{% if voting %}
+    {{voting.title_text}}<p>
+    {{voting.question_text}}<p>
+    {{voting.explanation_text}}<p>
+    {{voting.start_date}}<p>
+    {{voting.end_date}}<p>
+    {{voting.assembly.name_text}}<p>
+    {{voting.state}}<p>
+
+    <a href="{% url 'votings:votings_delete' voting.id %}" class="button btn btn-default">Delete</a>
+    <a href="{% url 'votings:votings_edit' voting.id %}" class="button btn btn-default">Edit</a>
+
+    {% if voting %}
+        <h2>options</h2>
+        <ul>
+        {% for option in options %}
+            <li>
+                {{option.index_number}}
+                {{ option.title_text }} 
+                <a href="{% url 'votings:options_delete' voting.id option.id%}" class="button btn btn-default">Delete</a>
+                <a href="{% url 'votings:options_edit' voting.id option.id%}" class="button btn btn-default">Edit</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p> There is no options.</p>
+    {% endif %}
+    <h2> New option </h2>
+    <form action="{% url 'votings:options_create' voting.id %}" method="post" class="post-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
+
+{% else %}
+    <p> voting are NOT available.</p>
+{% endif %}
+
+{% endblock %}
