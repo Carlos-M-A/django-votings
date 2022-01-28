@@ -3,4 +3,4 @@ include README.rst
 recursive-include votings/static *
 recursive-include votings/templates *
 exclude manage.py
-exclude tests/*
+exclude wrapper/*
