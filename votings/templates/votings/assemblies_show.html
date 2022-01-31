@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block page_content %}
 
 
@@ -11,6 +13,27 @@
 <p> {{assembly.created_date}} </p>
 <p> {{assembly.updated_date}} </p>
 
-<a href="{% url 'votings:votings_create' assembly.id %}">Add new voting </a>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newvoting">New voting</button>
 
+<!-- New voting modal -->
+<div class="modal" id="newvoting">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">New voting</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            <form action="{% url 'votings:votings_create' assembly.id %}" method="post" class="post-form">
+                {% csrf_token %}
+                {{ new_voting_form | crispy }}       
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="save btn btn-primary">Save</button>
+            </form>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

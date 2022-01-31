@@ -1,6 +1,8 @@
+from attr import attr, attrs
 from django import forms
 from .models import Option, Voting
 from django.utils.translation import ugettext_lazy as _
+from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 
 class VotingForm(forms.ModelForm):
     class Meta:
@@ -22,8 +24,13 @@ class VotingForm(forms.ModelForm):
         }
 
 class VotingDatesForm(forms.ModelForm):
-    start_date = forms.DateTimeField()
-    end_date = forms.DateTimeField()
+    class Meta:
+        model = Voting
+        fields = ('start_date', 'end_date')
+        widgets = {
+            'start_date': DateTimePickerInput(),
+            'end_date': DateTimePickerInput(),
+        }
 
 class OptionForm(forms.ModelForm):
     class Meta:

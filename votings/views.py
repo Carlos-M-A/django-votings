@@ -6,7 +6,7 @@ from django.http import Http404
 from django.urls import reverse
 from django.views import generic
 from .models import Assembly, Option, Voting, VotingStates
-from .forms import OptionForm, VotingForm
+from .forms import OptionForm, VotingDatesForm, VotingForm
 
 def general_index(request, general_assembly_id):
     general_assembly = get_object_or_404(Assembly, pk=general_assembly_id)
@@ -19,8 +19,10 @@ def general_index(request, general_assembly_id):
 
 def assemblies_show(request, assembly_id):
     assembly = get_object_or_404(Assembly, pk=assembly_id)
+    new_voting_form = VotingForm()
     context = {
         'assembly':assembly,
+        'new_voting_form':new_voting_form
     }
     return render(request, 'votings/assemblies_show.html', context)
 
@@ -55,11 +57,21 @@ def votings_show(request, voting_id):
     try:
         voting:Voting = Voting.objects.get(pk=voting_id)
         options = voting.option_set.all()
-        form = OptionForm()
+        edit_voting_form = VotingForm(instance=voting)
+        new_option_form = OptionForm()
+        calendar_voting_form = VotingDatesForm()
+        edit_option_forms = dict()
+        for option in options:
+            form_edit = OptionForm(instance=option)
+            edit_option_forms[option.id] = form_edit
+
         context = {
             'voting':voting,
             'options':options,
-            'form':form,
+            'new_option_form':new_option_form,
+            'edit_option_forms':edit_option_forms,
+            'edit_voting_form':edit_voting_form,
+            'calendar_voting_form':calendar_voting_form
         }
     except Voting.DoesNotExist:
         raise Http404('Voting does not exist')
@@ -71,10 +83,15 @@ def votings_edit(request, voting_id):
         form = VotingForm(request.POST, instance=voting)
         if form.is_valid():
             form.save()
-            return redirect('votings:votings_show', voting_id=voting.id)
-    else:
-        form = VotingForm(instance=voting)
-    return render(request, 'votings/votings_edit.html', {'form': form})
+    return redirect('votings:votings_show', voting_id=voting.id)
+
+def votings_calendar(request, voting_id):
+    voting = get_object_or_404(Voting, pk=voting_id)
+    if request.method == "POST":
+        form = VotingForm(request.POST, instance=voting)
+        if form.is_valid():
+            form.save()
+    return redirect('votings:votings_show', voting_id=voting.id)
 
 def votings_delete(request, voting_id):
     voting = get_object_or_404(Voting, pk=voting_id)
