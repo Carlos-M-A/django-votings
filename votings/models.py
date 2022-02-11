@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-import datetime
+from django.utils import timezone
 
 class VotingStates():
     EDITABLE = 1
@@ -49,8 +49,8 @@ class Voting(models.Model):
     def __str__(self):
         return self.title_text + ' (' + self.assembly.name_text + ')'
 
-    def update_status(self):
-        now = datetime.datetime.now()
+    def update_state(self):
+        now = timezone.now()
         if self.end_date == None or self.start_date == None:
             self.state = VotingStates.EDITABLE
         elif now < self.start_date:

@@ -5,7 +5,8 @@ from django.template import loader
 from django.http import Http404
 from django.urls import reverse
 from django.views import generic
-from .models import Assembly, Option, Voting, VotingStates
+from django.core.exceptions import PermissionDenied
+from .models import Assembly, Option, Participation, Vote, Voting, VotingStates
 from .forms import OptionForm, VotingDatesForm, VotingForm
 
 def general_index(request, general_assembly_id):
@@ -59,7 +60,7 @@ def votings_show(request, voting_id):
         options = voting.option_set.all()
         edit_voting_form = VotingForm(instance=voting)
         new_option_form = OptionForm()
-        calendar_voting_form = VotingDatesForm()
+        calendar_voting_form = VotingDatesForm(instance=voting)
         edit_option_forms = dict()
         for option in options:
             form_edit = OptionForm(instance=option)
@@ -85,41 +86,72 @@ def votings_edit(request, voting_id):
             form.save()
     return redirect('votings:votings_show', voting_id=voting.id)
 
-def votings_calendar(request, voting_id):
-    voting = get_object_or_404(Voting, pk=voting_id)
-    if request.method == "POST":
-        form = VotingForm(request.POST, instance=voting)
-        if form.is_valid():
-            form.save()
-    return redirect('votings:votings_show', voting_id=voting.id)
-
 def votings_delete(request, voting_id):
     voting = get_object_or_404(Voting, pk=voting_id)
+    assembly_id = voting.assembly.id
     if request.method == "POST":
         voting.delete()
-        return redirect('votings:votings_index')
-    else:
-        form = VotingForm(instance=voting)
-    return render(request, 'votings/votings_delete.html', {'voting': voting})
+    return redirect('votings:assemblies_show', assembly_id)
+
+def votings_schedule(request, voting_id):
+    voting = get_object_or_404(Voting, pk=voting_id)
+    if request.method == "POST":
+        form = VotingDatesForm(request.POST, instance=voting)
+        if form.is_valid():
+            form.save()
+            voting.update_state()
+            voting.save()
+    return redirect('votings:votings_show', voting_id=voting.id)
+
+def votings_unschedule(request, voting_id):
+    voting = get_object_or_404(Voting, pk=voting_id)
+    if request.method == "POST":
+        voting.start_date = None
+        voting.end_date = None
+        voting.update_state()
+        voting.save()
+    return redirect('votings:votings_show', voting_id=voting.id)
 
 def options_create(request, voting_id):
     voting = get_object_or_404(Voting, pk=voting_id)
-    form = OptionForm(request.POST)
-    if form.is_valid():
-        option = form.save(commit=False)
-        option.votes_quantity = 0
-        option.voting = voting
-        option.save()
+    if request.method == "POST":
+        form = OptionForm(request.POST)
+        if form.is_valid():
+            option = form.save(commit=False)
+            option.votes_quantity = 0
+            option.voting = voting
+            option.save()
     return redirect('votings:votings_show', voting_id=voting_id)
 
 def options_edit(request, voting_id, option_id):
     option = get_object_or_404(Option, pk=option_id)
-    form = OptionForm(request.POST, instance=option)
-    if form.is_valid():
-        form.save()
+    if request.method == "POST":
+        form = OptionForm(request.POST, instance=option)
+        if form.is_valid():
+            form.save()
     return redirect('votings:votings_show', voting_id=option.voting.id)
 
 def options_delete(request, voting_id, option_id):
     option = get_object_or_404(Option, pk=option_id)
-    option.delete()
+    if request.method == "POST":
+        option.delete()
+    return redirect('votings:votings_show', voting_id=option.voting.id)
+
+def votes_create(request, voting_id, option_id):
+    if request.method != "POST":
+        raise Http404()
+    option = get_object_or_404(Option, pk=option_id)
+    voting = get_object_or_404(Voting, pk=voting_id)
+    if option.voting.id != voting_id:
+        raise Http404()
+    if option.voting.state != VotingStates.OPENED:
+        raise PermissionDenied()
+    vote = Vote()
+    participation = Participation()
+    vote.option = option
+    participation.user = request.user
+    if not voting.are_votes_anonymous:
+        vote.user = request.user
+    vote.save()
+    participation.save()
     return redirect('votings:votings_show', voting_id=option.voting.id)

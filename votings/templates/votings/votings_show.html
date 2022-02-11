@@ -16,27 +16,35 @@
 
       <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletevoting">Delete</button>
       <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#editvoting">Edit</button>
-      <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#datetimevoting">Calendar</button>
+      <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#datetimevoting">Schedule</button>
+      <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#unschedulevoting">Unschedule</button>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newoption">New option</button>
     {% if voting %}
         <h2>options</h2>
-        <ul>
+        <ul class="list-group">
         {% for option in options %}
-            <li>
+            <li class="list-group-item" data-bs-toggle="collapse" data-bs-target="#optionexplanation{{option.id}}">
                 {% if option.index_number%}
                 {{option.index_number}}
                 {% endif%}
                 {{option.title_text}}
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteoption{{option.id}}">Delete</button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editoption{{option.id}}">Edit</button>
-
+                <svg  width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                  <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                </svg>
+                <div class="btn-group">
+                  <button type="button" class="btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteoption{{option.id}}">Delete</button>
+                  <button type="button" class="btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editoption{{option.id}}">Edit</button>
+                  <button type="button" class="btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#voteoption{{option.id}}">Vote</button>
+                </div>
+                <div id="optionexplanation{{option.id}}" class="collapse">
+                  {{option.explanation_text}}
+                </div>
             </li>
         {% endfor %}
         </ul>
     {% else %}
         <p> There is no options.</p>
     {% endif %}
-
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newoption">New option</button>
 
 
 
@@ -72,7 +80,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form method="POST" class="post-form">
+        <form action="{% url 'votings:votings_delete' voting.id %}" method="POST" class="post-form">
           {% csrf_token %}     
       </div>
       <div class="modal-footer">
@@ -87,28 +95,51 @@
 
 
 
-<!-- Date time modal -->
+<!-- Schedule date-time modal -->
 {{ calendar_voting_form.media }} 
 <div class="modal" id="datetimevoting">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Calendar voting</h4>
+        <h4 class="modal-title">Schedule voting</h4>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form method="POST" class="post-form">
+        <form action="{% url 'votings:votings_schedule' voting.id %}" method="POST" class="post-form">
           {% csrf_token %}
           {{ calendar_voting_form | crispy}}       
       </div>
       <div class="modal-footer">
-      <button type="submit" class="save btn btn-primary">Save</button>
+      <button type="submit" class="save btn btn-primary">Schedule</button>
       </form>
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
 </div>
+
+
+<!-- Unschedule voting modal -->
+<div class="modal" id="unschedulevoting">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Unschedule voting</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{% url 'votings:votings_unschedule' voting.id %}" method="POST" class="post-form">
+          {% csrf_token %}     
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="save btn btn-default">Unschedule</button>
+        </form> 
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 <!-- New option modal -->
@@ -134,8 +165,8 @@
   </div>
   
 
-{% for option_id, edit_option_form in edit_option_forms.items %}
 <!-- Edit option modal -->
+{% for option_id, edit_option_form in edit_option_forms.items %}
 <div class="modal" id="editoption{{option_id}}">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -158,8 +189,8 @@
   </div>
   {% endfor %}
 
+<!-- Delete option modal -->
 {% for option in options %}
-  <!-- Delete option modal -->
 <div class="modal" id="deleteoption{{option.id}}">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -181,13 +212,31 @@
 {% endfor %}
 
 
+<!-- Vote option modal -->
+{% for option in options %}
+<div class="modal" id="voteoption{{option.id}}">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Vote option</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        {{option.title_text}} <p>
+        {{option.explanation_text}}
+      </div>
+      <div class="modal-footer">
+        <a href="{% url 'votings:votes_create' voting.id option.id%}" class="button btn btn-default">Vote</a>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+
 
 
 {% endif %}
-<script>
-  $('.datepicker').datepicker({
-    format: 'mm/dd/yyyy',
-    startDate: '-3d'
-});
-</script>
+
 {% endblock %}
