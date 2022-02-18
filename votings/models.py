@@ -3,10 +3,10 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 class VotingStates():
-    EDITABLE = 1
-    READY = 2
-    OPENED = 3
-    CLOSED = 4
+    PLANNED = 1
+    SCHEDULED = 2
+    ACTIVE = 3
+    FINISHED = 4
 
 
 class Assembly(models.Model):
@@ -47,18 +47,18 @@ class Voting(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.title_text + ' (' + self.assembly.name_text + ')'
+        return self.title_text
 
     def update_state(self):
         now = timezone.now()
         if self.end_date == None or self.start_date == None:
-            self.state = VotingStates.EDITABLE
+            self.state = VotingStates.PLANNED
         elif now < self.start_date:
-            self.state = VotingStates.READY
+            self.state = VotingStates.SCHEDULED
         elif now < self.end_date:
-            self.state = VotingStates.OPENED
+            self.state = VotingStates.ACTIVE
         elif now >= self.end_date:
-            self.state = VotingStates.CLOSED
+            self.state = VotingStates.FINISHED
 
 
 class Option(models.Model):

@@ -15,6 +15,74 @@
 
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newvoting">New voting</button>
 
+<!-- Nav pills -->
+<ul class="nav nav-pills">
+  <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="pill" href="#menu-planned">Planned</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="pill" href="#menu-scheduled">Scheduled</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-bs-toggle="pill" href="#menu-active">Active</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="pill" href="#menu-finished">Finished</a>
+  </li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane container fade" id="menu-planned">
+    {% if planned_votings %}
+      <ul>
+    {% for voting in planned_votings %}
+        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting }}</a></li>
+    {% endfor %}
+      </ul>
+    {% else %}
+      <p>There are NO votings.</p>
+    {% endif %}
+  </div>
+  <div class="tab-pane container fade" id="menu-scheduled">
+    {% if scheduled_votings %}
+      <ul>
+    {% for voting in scheduled_votings %}
+        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting }}</a></li>
+    {% endfor %}
+      </ul>
+    {% else %}
+      <p>There are NO votings.</p>
+    {% endif %}
+  </div>
+  <div class="tab-pane container active" id="menu-active">
+    {% if active_votings %}
+      <ul>
+    {% for voting in active_votings %}
+        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting }}</a></li>
+    {% endfor %}
+      </ul>
+    {% else %}
+      <p>There are NO votings.</p>
+    {% endif %}
+  </div>
+  <div class="tab-pane container fade" id="menu-finished">
+    {% if finished_votings %}
+      <ul>
+    {% for voting in finished_votings %}
+        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting }}</a></li>
+    {% endfor %}
+      </ul>
+    {% else %}
+      <p>There are NO votings.</p>
+    {% endif %}
+  </div>
+</div>
+
+
+
+
+
 <!-- New voting modal -->
 <div class="modal" id="newvoting">
     <div class="modal-dialog modal-dialog-centered">

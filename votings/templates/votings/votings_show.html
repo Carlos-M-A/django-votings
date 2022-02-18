@@ -224,9 +224,14 @@
       <div class="modal-body">
         {{option.title_text}} <p>
         {{option.explanation_text}}
+        
       </div>
       <div class="modal-footer">
-        <a href="{% url 'votings:votes_create' voting.id option.id%}" class="button btn btn-default">Vote</a>
+        <form action="{% url 'votings:votes_create' voting.id option.id %}" method="post" class="post-form">
+          {% csrf_token %}
+          <button type="submit" class="save btn btn-primary">Vote</button>
+        </form>
+        
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
       </div>
     </div>

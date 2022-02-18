@@ -21,18 +21,27 @@ def general_index(request, general_assembly_id):
 def assemblies_show(request, assembly_id):
     assembly = get_object_or_404(Assembly, pk=assembly_id)
     new_voting_form = VotingForm()
+    planned_votings = assembly.voting_set.filter(state=1)
+    scheduled_votings = assembly.voting_set.filter(state=2)
+    active_votings = assembly.voting_set.filter(state=3)
+    finished_votings = assembly.voting_set.filter(state=4)
     context = {
         'assembly':assembly,
-        'new_voting_form':new_voting_form
+        'new_voting_form':new_voting_form,
+        'planned_votings':planned_votings,
+        'scheduled_votings':scheduled_votings,
+        'active_votings':active_votings,
+        'finished_votings':finished_votings,
     }
     return render(request, 'votings/assemblies_show.html', context)
 
-def votings_index(request):
+def votings_search(request):
+    name = request.GET.get('name')
     voting_list = Voting.objects.all()
     context = {
         'voting_list':voting_list,
     }
-    return render(request, 'votings/votings_index.html', context)
+    return render(request, 'votings/votings_search.html', context)
 
 def votings_create(request, assembly_id):
     assembly = get_object_or_404(Assembly, pk=assembly_id)
@@ -43,7 +52,7 @@ def votings_create(request, assembly_id):
             voting.assembly = assembly
             voting.electorate_quantity = 0
             voting.votes_quantity = 0
-            voting.state = VotingStates.EDITABLE
+            voting.state = VotingStates.PLANNED
             voting.save()
             return redirect('votings:votings_show', voting_id=voting.id)
     else:
@@ -142,10 +151,11 @@ def votes_create(request, voting_id, option_id):
         raise Http404()
     option = get_object_or_404(Option, pk=option_id)
     voting = get_object_or_404(Voting, pk=voting_id)
-    if option.voting.id != voting_id:
+    if option.voting.id != voting.id:
         raise Http404()
-    if option.voting.state != VotingStates.OPENED:
+    if option.voting.state != VotingStates.ACTIVE:
         raise PermissionDenied()
+    
     vote = Vote()
     participation = Participation()
     vote.option = option
