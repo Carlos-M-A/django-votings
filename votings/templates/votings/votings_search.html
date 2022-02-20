@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block page_content %}
+
+    <form action="{% url 'votings:votings_search' %}" method="get" class="post-form">
+        <div class="row">
+            <div class="form-group col-md-9 mb-0">
+                {{ form.text | as_crispy_field }}
+            </div>
+            <div class="form-group col-md-3 mb-0">
+                <button type="submit" class="save btn btn-primary">Search</button>
+            </div>
+            
+        </div>
+        
+        <div class="row">
+            <div class="form-group col-md-4 mb-0">
+                {{ form.date_since | as_crispy_field }}
+            </div>
+            <div class="form-group col-md-4 mb-0">
+                {{ form.date_until | as_crispy_field }}
+            </div>
+            <div class="form-group col-md-3 mb-0">
+                {{ form.state | as_crispy_field }}
+            </div>
+        </div>
+    </form>
+
+
+{% if voting_list %}
+    <ul>
+    {% for voting in voting_list %}
+        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting.title_text }} -- {{voting.start_date}}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No votings are available.</p>
+{% endif %}
+<p>
+
+{% endblock %}
