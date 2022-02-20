@@ -3,8 +3,15 @@ from attr import attr, attrs
 from django import forms
 from .models import Option, Voting, VotingStates
 from django.utils.translation import ugettext_lazy as _
-from bootstrap_datepicker_plus.widgets import DateTimePickerInput
+from bootstrap_datepicker_plus.widgets import DateTimePickerInput, DatePickerInput
 
+CHOICES_VOTING_STATES = (
+        (0, ''),
+        (VotingStates.PLANNED, _('PLANNED')),
+        (VotingStates.SCHEDULED, _('SCHEDULED')),
+        (VotingStates.ACTIVE, _('ACTIVE')),
+        (VotingStates.FINISHED, _('FINISHED')),
+    )
 
 class VotingForm(forms.ModelForm):
     class Meta:
@@ -41,11 +48,9 @@ class OptionForm(forms.ModelForm):
                     'explanation_text')
 
 class SearchVotingForm(forms.Form):
-    CHOICES_VOTING_STATES = (
-        (_('PLANNED'), VotingStates.PLANNED),
-        (_('SCHEDULED'), VotingStates.SCHEDULED),
-        (_('ACTIVE'), VotingStates.ACTIVE),
-        (_('FINISHED'), VotingStates.FINISHED),
-    )
-    text = forms.CharField(label='text', max_length=100)
-    state = forms.ChoiceField(label='state', choices=CHOICES_VOTING_STATES)
+    text = forms.CharField(label="", max_length=100, required=False)
+    state = forms.ChoiceField(label='state', choices=CHOICES_VOTING_STATES, required=False)
+    date_since = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    date_until = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    id_assembly = forms.HiddenInput()
+    as_general = forms.HiddenInput()

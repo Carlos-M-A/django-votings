@@ -1,3 +1,5 @@
+from calendar import month
+from datetime import timedelta
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
@@ -5,9 +7,11 @@ from django.template import loader
 from django.http import Http404
 from django.urls import reverse
 from django.views import generic
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, SuspiciousOperation, BadRequest
+from django.db.models import Q
 from .models import Assembly, Option, Participation, Vote, Voting, VotingStates
-from .forms import OptionForm, VotingDatesForm, VotingForm
+from .forms import OptionForm, SearchVotingForm, VotingDatesForm, VotingForm
+
 
 def general_index(request, general_assembly_id):
     general_assembly = get_object_or_404(Assembly, pk=general_assembly_id)
@@ -21,10 +25,10 @@ def general_index(request, general_assembly_id):
 def assemblies_show(request, assembly_id):
     assembly = get_object_or_404(Assembly, pk=assembly_id)
     new_voting_form = VotingForm()
-    planned_votings = assembly.voting_set.filter(state=1)
-    scheduled_votings = assembly.voting_set.filter(state=2)
-    active_votings = assembly.voting_set.filter(state=3)
-    finished_votings = assembly.voting_set.filter(state=4)
+    planned_votings = assembly.voting_set.filter(state=VotingStates.PLANNED)
+    scheduled_votings = assembly.voting_set.filter(state=VotingStates.SCHEDULED).order_by('start_date')
+    active_votings = assembly.voting_set.filter(state=VotingStates.ACTIVE)
+    finished_votings = assembly.voting_set.filter(state=VotingStates.FINISHED).order_by('-start_date')
     context = {
         'assembly':assembly,
         'new_voting_form':new_voting_form,
@@ -36,12 +40,43 @@ def assemblies_show(request, assembly_id):
     return render(request, 'votings/assemblies_show.html', context)
 
 def votings_search(request):
-    name = request.GET.get('name')
-    voting_list = Voting.objects.all()
-    context = {
-        'voting_list':voting_list,
-    }
-    return render(request, 'votings/votings_search.html', context)
+    form = SearchVotingForm(request.GET)
+    if form.is_valid():
+        text = form.cleaned_data['text']
+        state = form.cleaned_data['state']
+        date_since = form.cleaned_data['date_since']
+        date_until = form.cleaned_data['date_until']
+
+        voting_list = Voting.objects.filter(Q(title_text__icontains=text) | Q(question_text__icontains=text))
+        if date_since != None:
+            voting_list = voting_list.filter(start_date__gt=date_since)
+        if date_until != None:
+            date_until += timedelta(days=1)
+            voting_list = voting_list.filter(start_date__lt=date_until)
+        if len(state) > 0 and int(state) > 0:
+                voting_list = voting_list.filter(state=int(state))
+        
+        if date_since != None or date_until != None:
+            voting_list = voting_list.order_by('start_date')
+        elif len(state) > 0:
+            state = int(state)
+            if state == 0:
+                voting_list = voting_list.order_by('-start_date')
+            elif state == VotingStates.FINISHED:
+                voting_list = voting_list.order_by('-start_date')
+            elif state == VotingStates.SCHEDULED:
+                voting_list = voting_list.order_by('start_date')
+        else:
+            voting_list = voting_list.order_by('-start_date')
+        
+        context = {
+            'form':form,
+            'voting_list':voting_list,
+        }
+        return render(request, 'votings/votings_search.html', context)
+
+    else:
+        raise BadRequest()
 
 def votings_create(request, assembly_id):
     assembly = get_object_or_404(Assembly, pk=assembly_id)
