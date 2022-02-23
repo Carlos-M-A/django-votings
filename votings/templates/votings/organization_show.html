@@ -2,7 +2,8 @@
 
 {% block page_content %}
 
-<a href="{% url 'votings:assemblies_show' general_assembly.id %}">{{general_assembly.name_text}}</a>
+{{organization.name_text}}
+<p>
 {% if assemblies %}
 <ul>
     {% for assembly in assemblies %}

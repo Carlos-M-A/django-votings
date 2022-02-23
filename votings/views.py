@@ -9,18 +9,21 @@ from django.urls import reverse
 from django.views import generic
 from django.core.exceptions import PermissionDenied, SuspiciousOperation, BadRequest
 from django.db.models import Q
-from .models import Assembly, Option, Participation, Vote, Voting, VotingStates
+from .models import Assembly, Option, Organization, Participation, Vote, Voting, VotingStates
 from .forms import OptionForm, SearchVotingForm, VotingDatesForm, VotingForm
+from django.contrib.auth.models import User
 
-
-def general_index(request, general_assembly_id):
-    general_assembly = get_object_or_404(Assembly, pk=general_assembly_id)
-    assemblies = general_assembly.assembly_set.all()
+def organizations_show(request, organization_id):
+    organization = get_object_or_404(Organization, pk=organization_id)
+    assemblies = organization.assembly_set.all()
     context = {
-        'general_assembly':general_assembly,
+        'organization':organization,
         'assemblies':assemblies
     }
-    return render(request, 'votings/general_index.html', context)
+    return render(request, 'votings/organization_show.html', context)
+
+def organization_create(request):
+    pass
 
 def assemblies_show(request, assembly_id):
     assembly = get_object_or_404(Assembly, pk=assembly_id)
@@ -46,7 +49,7 @@ def votings_search(request):
         state = form.cleaned_data['state']
         date_since = form.cleaned_data['date_since']
         date_until = form.cleaned_data['date_until']
-
+        
         voting_list = Voting.objects.filter(Q(title_text__icontains=text) | Q(question_text__icontains=text))
         if date_since != None:
             voting_list = voting_list.filter(start_date__gt=date_since)
@@ -73,6 +76,7 @@ def votings_search(request):
             'form':form,
             'voting_list':voting_list,
         }
+
         return render(request, 'votings/votings_search.html', context)
 
     else:

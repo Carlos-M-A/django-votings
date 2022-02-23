@@ -8,7 +8,7 @@
 <p> {{assembly.name_text}} </p>
 <p> {{assembly.description_text}} </p>
 <p> {{assembly.is_general}} </p>
-<p><a href="{% url 'votings:general_index' assembly.general_assembly.id %}"> {{assembly.general_assembly.name_text}} </a></p>
+<p><a href="{% url 'votings:organizations_show' assembly.organization.id %}"> {{assembly.organization.name_text}} </a></p>
 <p> {{assembly.manager}} </p>
 <p> {{assembly.created_date}} </p>
 <p> {{assembly.updated_date}} </p>

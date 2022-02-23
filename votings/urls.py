@@ -8,8 +8,8 @@ from . import views
 
 app_name = 'votings'
 urlpatterns = [
-    path('general/<int:general_assembly_id>', views.general_index, name='general_index'),
-    path('assemblies/<int:assembly_id>/votings', views.assemblies_show, name='assemblies_show'),
+    path('organizations/<int:organization_id>', views.organizations_show, name='organizations_show'),
+    path('assemblies/<int:assembly_id>/', views.assemblies_show, name='assemblies_show'),
     path('assemblies/<int:assembly_id>/votings/create', views.votings_create, name='votings_create'),
 
     path('votings/', views.votings_search, name='votings_search'),

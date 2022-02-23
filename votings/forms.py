@@ -1,7 +1,8 @@
 from cProfile import label
+from pyexpat import model
 from attr import attr, attrs
 from django import forms
-from .models import Option, Voting, VotingStates
+from .models import Option, Organization, Voting, VotingStates
 from django.utils.translation import ugettext_lazy as _
 from bootstrap_datepicker_plus.widgets import DateTimePickerInput, DatePickerInput
 
@@ -12,6 +13,12 @@ CHOICES_VOTING_STATES = (
         (VotingStates.ACTIVE, _('ACTIVE')),
         (VotingStates.FINISHED, _('FINISHED')),
     )
+
+class OrganizationForm(forms.ModelForm):
+    class Meta:
+        model = Organization
+        fields = ( 'name_text',
+                    'description_text')
 
 class VotingForm(forms.ModelForm):
     class Meta:

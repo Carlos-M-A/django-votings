@@ -8,19 +8,28 @@ class VotingStates():
     ACTIVE = 3
     FINISHED = 4
 
+class Organization(models.Model):
+    name_text = models.CharField(max_length=128)
+    description_text = models.TextField(max_length=256, blank=True)
+    official_website_url = models.URLField(max_length=256, blank=True)
+    manager = models.ForeignKey(User, on_delete=models.RESTRICT)
+    general_assembly = models.ForeignKey('Assembly', on_delete=models.RESTRICT, related_name='+', null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.name_text
+    
 class Assembly(models.Model):
     name_text = models.CharField(max_length=128)
     description_text = models.TextField(max_length=256, blank=True)
-    is_general = models.BooleanField(default=False)
-    general_assembly = models.ForeignKey('self', on_delete=models.RESTRICT, null=True, blank=True)
+    organization = models.ForeignKey(Organization, on_delete=models.RESTRICT)
     manager = models.ForeignKey(User, on_delete=models.RESTRICT)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name_text
-
 
 class Membership(models.Model):
     assembly = models.ForeignKey(Assembly, on_delete=models.RESTRICT)
