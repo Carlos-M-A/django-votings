@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import GroupOfVoters, Membership, Participation, Tag, Voting, Option, PublicVote, AnonymousVote
+from .models import Assembly, Membership, Organization, Participation, Tag, Voting, Option, Vote
 from django.contrib.auth.models import User
 
 #admin.site.register(Voting)
@@ -15,9 +15,9 @@ class VotingAdmin(admin.ModelAdmin):
     inlines = [OptionInLine]
 
 admin.site.register(Voting, VotingAdmin)
-admin.site.register(PublicVote)
-admin.site.register(AnonymousVote)
+admin.site.register(Vote)
 admin.site.register(Participation)
 admin.site.register(Tag)
-admin.site.register(GroupOfVoters)
+admin.site.register(Assembly)
 admin.site.register(Membership)
+admin.site.register(Organization)

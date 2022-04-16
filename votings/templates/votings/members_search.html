@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block page_content %}
+
+    <form action="{% url 'votings:members_search' organization.id%}" method="get" class="post-form">
+        <div class="row">
+            <div class="form-group col-md-9 mb-0">
+                {{ form.text | as_crispy_field }}
+            </div>
+            <div class="form-group col-md-3 mb-0">
+                <button type="submit" class="save btn btn-primary">Search</button>
+            </div>
+            
+        </div>
+        
+        <div class="row">
+            <div class="form-group col-md-4 mb-0">
+                {{ form.date | as_crispy_field }}
+            </div>
+        </div>
+        {{ form.id_assembly }}
+    </form>
+
+
+{% if membership_list %}
+    <ul>
+    {% for membership in membership_list %}
+       <li>{{membership.user.username}} -- {{membership.start_date}} - {{membership.end_date}}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>This assembly has no members.</p>
+{% endif %}
+<p>
+
+{% endblock %}

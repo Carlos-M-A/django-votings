@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+{{organization.name_text}}
+<p>
+{% if assemblies %}
+<ul>
+    {% for assembly in assemblies %}
+    <li><a href="{% url 'votings:assemblies_show' assembly.id %}"> {{assembly.name_text}} </a></li>
+    {% endfor %}
+</ul>
+
+{% endif %}
+
+<form action="{% url 'votings:votings_search' %}" method="get">
+    {{search_voting_form.id_organization}} 
+    <button type="submit" class="save btn btn-primary">Seach votings</button>
+</form>
+
+<form action="{% url 'votings:members_search' organization.id %}" method="get">
+  <button type="submit" class="save btn btn-primary">Members</button>
+</form>
+  
+
+{% endblock %}

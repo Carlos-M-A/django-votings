@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block page_content %}
+
+
+<p> {{assembly.name_text}} </p>
+<p> {{assembly.description_text}} </p>
+<p> {{assembly.is_general}} </p>
+<p><a href="{% url 'votings:organizations_show' assembly.organization.id %}"> {{assembly.organization.name_text}} </a></p>
+<p> {{assembly.manager}} </p>
+<p> {{assembly.created_date}} </p>
+<p> {{assembly.updated_date}} </p>
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newvoting">New voting</button>
+<form action="{% url 'votings:votings_search' %}" method="get">
+  {{search_voting_form.id_assembly}} 
+  <button type="submit" class="save btn btn-primary">Seach</button>
+</form>
+
+<form action="{% url 'votings:members_search' assembly.organization.id %}" method="get">
+  {{search_member_form.id_assembly}} 
+  <button type="submit" class="save btn btn-primary">Members</button>
+</form>
+
+<!-- Nav pills -->
+<ul class="nav nav-pills">
+  <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="pill" href="#menu-planned">Planned</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="pill" href="#menu-scheduled">Scheduled</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-bs-toggle="pill" href="#menu-active">Active</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="pill" href="#menu-finished">Finished</a>
+  </li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane container fade" id="menu-planned">
+    {% if planned_votings %}
+      <ul>
+    {% for voting in planned_votings %}
+        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting }}</a></li>
+    {% endfor %}
+      </ul>
+    {% else %}
+      <p>There are NO votings.</p>
+    {% endif %}
+  </div>
+  <div class="tab-pane container fade" id="menu-scheduled">
+    {% if scheduled_votings %}
+      <ul>
+    {% for voting in scheduled_votings %}
+        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting }}</a></li>
+    {% endfor %}
+      </ul>
+    {% else %}
+      <p>There are NO votings.</p>
+    {% endif %}
+  </div>
+  <div class="tab-pane container active" id="menu-active">
+    {% if active_votings %}
+      <ul>
+    {% for voting in active_votings %}
+        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting }}</a></li>
+    {% endfor %}
+      </ul>
+    {% else %}
+      <p>There are NO votings.</p>
+    {% endif %}
+  </div>
+  <div class="tab-pane container fade" id="menu-finished">
+    {% if finished_votings %}
+      <ul>
+    {% for voting in finished_votings %}
+        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting }}</a></li>
+    {% endfor %}
+      </ul>
+    {% else %}
+      <p>There are NO votings.</p>
+    {% endif %}
+  </div>
+</div>
+
+
+
+
+
+<!-- New voting modal -->
+<div class="modal" id="newvoting">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">New voting</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            <form action="{% url 'votings:votings_create' %}" method="post" class="post-form">
+                {% csrf_token %}
+                {{ new_voting_form | crispy }}       
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="save btn btn-primary">Save</button>
+            </form>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
