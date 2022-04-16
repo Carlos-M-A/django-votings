@@ -14,6 +14,15 @@
 <p> {{assembly.updated_date}} </p>
 
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newvoting">New voting</button>
+<form action="{% url 'votings:votings_search' %}" method="get">
+  {{search_voting_form.id_assembly}} 
+  <button type="submit" class="save btn btn-primary">Seach</button>
+</form>
+
+<form action="{% url 'votings:members_search' assembly.organization.id %}" method="get">
+  {{search_member_form.id_assembly}} 
+  <button type="submit" class="save btn btn-primary">Members</button>
+</form>
 
 <!-- Nav pills -->
 <ul class="nav nav-pills">
@@ -92,7 +101,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-            <form action="{% url 'votings:votings_create' assembly.id %}" method="post" class="post-form">
+            <form action="{% url 'votings:votings_create' %}" method="post" class="post-form">
                 {% csrf_token %}
                 {{ new_voting_form | crispy }}       
         </div>

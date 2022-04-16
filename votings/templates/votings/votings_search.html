@@ -26,13 +26,15 @@
                 {{ form.state | as_crispy_field }}
             </div>
         </div>
+        {{ form.id_assembly }}
+        {{ form.id_organization}}
     </form>
 
 
 {% if voting_list %}
     <ul>
     {% for voting in voting_list %}
-        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting.title_text }} -- {{voting.start_date}}</a></li>
+        <li><a href="{% url 'votings:votings_show' voting.id %}">{{ voting.title_text }} -- {{voting.start_date}} - {{voting.end_date}} </a></li>
     {% endfor %}
     </ul>
 {% else %}

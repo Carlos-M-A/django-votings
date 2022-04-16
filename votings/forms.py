@@ -26,7 +26,8 @@ class VotingForm(forms.ModelForm):
         fields = (  'title_text', 
                     'question_text',
                     'explanation_text',
-                    'are_votes_anonymous')
+                    'are_votes_anonymous',
+                    'assembly')
         labels = {
             'title_text': _('Title'),
         }
@@ -37,6 +38,9 @@ class VotingForm(forms.ModelForm):
             'title_text': {
                 'max_length': _("This title is too long."),
             },
+        }
+        widgets = {
+            'assembly': forms.widgets.HiddenInput()
         }
 
 class VotingDatesForm(forms.ModelForm):
@@ -59,5 +63,10 @@ class SearchVotingForm(forms.Form):
     state = forms.ChoiceField(label='state', choices=CHOICES_VOTING_STATES, required=False)
     date_since = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
     date_until = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
-    id_assembly = forms.HiddenInput()
-    as_general = forms.HiddenInput()
+    id_assembly = forms.IntegerField(widget=forms.widgets.HiddenInput(), required=False)
+    id_organization = forms.IntegerField(widget=forms.widgets.HiddenInput(), required=False)
+
+class SearchMemberForm(forms.Form):
+    text = forms.CharField(label="", max_length=100, required=False)
+    date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    id_assembly = forms.IntegerField(widget=forms.widgets.HiddenInput(), required=False)
