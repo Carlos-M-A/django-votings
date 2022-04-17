@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+{{organization.name_text}}
+<p>
+Your cast vote in the voting: {{voting.title_text}}
+<p>
+In the question: {{voting.question_text}}
+<p>
+You vote for the option: {{option}}
+<p>
+Your vote registration number is: {{vote.id}}
+{% if voting %}
+    <p>
+    Remember this registration number to check your vote in the future
+{% endif %}
+
+<a href="{% url 'votings:votings_show' voting.id %}"> {{voting.title_text}} </a>
+
+{% endblock %}

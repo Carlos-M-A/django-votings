@@ -89,7 +89,7 @@ class Vote(models.Model):
         if self.user == None:
             return str(self.id) + ': ' + str(self.option.index_number)
         else:
-            return str(self.user.id) + ': ' + str(self.option.index_number)
+            return str(self.id) + ' (' + str(self.user.id) + ')' + ': ' + str(self.option.index_number)
 
 
 class Participation(models.Model):

@@ -4,7 +4,7 @@ from django.http import Http404
 from django.core.exceptions import PermissionDenied, BadRequest
 from django.db.models import Q
 from .models import Assembly, Membership, Option, Organization, Participation, Vote, Voting, VotingStates
-from .forms import OptionForm, SearchVotingForm, VotingDatesForm, VotingForm, SearchMemberForm
+from .forms import OptionForm, SearchVotingForm, VotingDatesForm, VotingForm, SearchMemberForm, SearchVotesForm
 from django.contrib.auth.models import User
 
 def organizations_show(request, organization_id):
@@ -140,10 +140,19 @@ def votings_create(request):
     else:
         raise BadRequest()
 
+def votings_show_finished_voting(request, voting, options):
+    context = {
+            'voting':voting,
+            'options':options,
+        }
+    return render(request, 'votings/finished_voting_show.html', context)
+
 def votings_show(request, voting_id):
     try:
         voting:Voting = Voting.objects.get(pk=voting_id)
         options = voting.option_set.all()
+        if voting.state == VotingStates.FINISHED:
+            return votings_show_finished_voting(request, voting, options)
         edit_voting_form = VotingForm(instance=voting)
         new_option_form = OptionForm()
         calendar_voting_form = VotingDatesForm(instance=voting)
@@ -234,11 +243,42 @@ def votes_create(request, voting_id, option_id):
         raise PermissionDenied()
     
     vote = Vote()
-    participation = Participation()
-    vote.option = option
-    participation.user = request.user
     if not voting.are_votes_anonymous:
         vote.user = request.user
+    vote.option = option
     vote.save()
+    participation = Participation()
+    participation.user = request.user
+    participation.voting = voting
+    participation.participation_check = True
     participation.save()
-    return redirect('votings:votings_show', voting_id=option.voting.id)
+
+    context = {
+        'voting':voting,
+        'option':option,
+        'vote':vote
+    }
+    return render(request, 'votings/cast_vote_show.html', context)
+
+def votes_search(request, voting_id):
+    voting = get_object_or_404(Voting, pk=voting_id)
+    form = SearchVotesForm(request.GET)
+    if form.is_valid():
+        registration_number = form.cleaned_data['registration_number']
+        index_number = form.cleaned_data['index_number']
+        username = form.cleaned_data['username']
+
+    votes_list = Vote.objects.filter(option__voting=voting)
+    if index_number != None:
+        votes_list = votes_list.filter(option__index_number=index_number)
+    if registration_number != None:
+        votes_list = votes_list.filter(id=registration_number)
+    if username != None and len(username) > 0:
+        votes_list = votes_list.filter(Q(user__username__icontains=username) | Q(user__first_name__icontains=username) | Q(user__last_name__icontains=username))
+
+    context = {
+        'voting':voting,
+        'search_votes_form':form,
+        'votes_list':votes_list
+    }
+    return render(request, 'votings/votes_search.html', context)
