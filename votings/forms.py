@@ -72,3 +72,6 @@ class SearchVotesForm(forms.Form):
     username = forms.CharField(label="username", max_length=100, required=False)
     registration_number = forms.IntegerField(label="Registration number", required=False)
     index_number = forms.IntegerField(label="Option index number", required=False)
+
+class SearchParticipationsForm(forms.Form):
+    username = forms.CharField(label="username", max_length=100, required=False)

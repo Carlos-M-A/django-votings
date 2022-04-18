@@ -4,7 +4,7 @@ from django.http import Http404
 from django.core.exceptions import PermissionDenied, BadRequest
 from django.db.models import Q
 from .models import Assembly, Membership, Option, Organization, Participation, Vote, Voting, VotingStates
-from .forms import OptionForm, SearchVotingForm, VotingDatesForm, VotingForm, SearchMemberForm, SearchVotesForm
+from .forms import OptionForm, SearchVotingForm, VotingDatesForm, VotingForm, SearchMemberForm, SearchVotesForm, SearchParticipationsForm
 from django.contrib.auth.models import User
 
 def organizations_show(request, organization_id):
@@ -262,11 +262,13 @@ def votes_create(request, voting_id, option_id):
 
 def votes_search(request, voting_id):
     voting = get_object_or_404(Voting, pk=voting_id)
-    form = SearchVotesForm(request.GET)
-    if form.is_valid():
-        registration_number = form.cleaned_data['registration_number']
-        index_number = form.cleaned_data['index_number']
-        username = form.cleaned_data['username']
+    search_votes_form = SearchVotesForm(request.GET)
+    search_participations_form = SearchParticipationsForm()
+
+    if search_votes_form.is_valid():
+        registration_number = search_votes_form.cleaned_data['registration_number']
+        index_number = search_votes_form.cleaned_data['index_number']
+        username = search_votes_form.cleaned_data['username']
 
     votes_list = Vote.objects.filter(option__voting=voting)
     if index_number != None:
@@ -276,9 +278,37 @@ def votes_search(request, voting_id):
     if username != None and len(username) > 0:
         votes_list = votes_list.filter(Q(user__username__icontains=username) | Q(user__first_name__icontains=username) | Q(user__last_name__icontains=username))
 
+    participations_list = Participation.objects.filter(voting=voting)
     context = {
         'voting':voting,
-        'search_votes_form':form,
-        'votes_list':votes_list
+        'search_votes_form':search_votes_form,
+        'search_participations_form':search_participations_form,
+        'votes_list':votes_list,
+        'participations_list':participations_list,
+        'votes_active': 'active',
+        'participations_active':''
     }
-    return render(request, 'votings/votes_search.html', context)
+    return render(request, 'votings/votes_and_participations_search.html', context)
+
+def participations_search(request, voting_id):
+    voting = get_object_or_404(Voting, pk=voting_id)
+    search_votes_form = SearchVotesForm()
+    search_participations_form = SearchParticipationsForm(request.GET)
+    if search_participations_form.is_valid():
+        username = search_participations_form.cleaned_data['username']
+
+    participations_list = Participation.objects.filter(voting=voting)
+    if username != None and len(username) > 0:
+        participations_list = participations_list.filter(Q(user__username__icontains=username) | Q(user__first_name__icontains=username) | Q(user__last_name__icontains=username))
+
+    votes_list = Vote.objects.filter(option__voting=voting)
+    context = {
+        'voting':voting,
+        'search_votes_form':search_votes_form,
+        'search_participations_form':search_participations_form,
+        'votes_list':votes_list,
+        'participations_list':participations_list,
+        'votes_active': '',
+        'participations_active':'active'
+    }
+    return render(request, 'votings/votes_and_participations_search.html', context)
