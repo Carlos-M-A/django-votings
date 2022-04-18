@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block page_content %}
+
+{% if voting %}
+    {{voting.title_text}}<p>
+    {{voting.question_text}}<p>
+    {{voting.explanation_text}}<p>
+    anonymous: {{voting.are_votes_anonymous}}<p>
+    {{voting.start_date}}<p>
+    {{voting.end_date}}<p>
+    <p> <a href="{% url 'votings:assemblies_show' voting.assembly.id %}"> {{voting.assembly.name_text}} </a> </p>
+    {{voting.state}}<p>
+
+    <p> <a href="{% url 'votings:votes_search' voting.id %}">{{voting.votes_quantity}} votes </a> </p>
+    <p> <a href="{% url 'votings:participations_search' voting.id %}"> participations </a> </p>
+    
+    {% if voting %}
+        <h2>options</h2>
+        <ul class="list-group">
+        {% for option in options %}
+            <li class="list-group-item" data-bs-toggle="collapse" data-bs-target="#optionexplanation{{option.id}}">
+                {% if option.index_number%}
+                {{option.index_number}}
+                {% endif%}
+                {{option.title_text}}
+                <div id="optionexplanation{{option.id}}" class="collapse">
+                  {{option.explanation_text}}
+                </div>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p> There is no options.</p>
+    {% endif %}
+
+{% endif %}
+
+{% endblock %}

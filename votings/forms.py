@@ -1,10 +1,7 @@
-from cProfile import label
-from pyexpat import model
-from attr import attr, attrs
 from django import forms
 from .models import Option, Organization, Voting, VotingStates
 from django.utils.translation import ugettext_lazy as _
-from bootstrap_datepicker_plus.widgets import DateTimePickerInput, DatePickerInput
+from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 
 CHOICES_VOTING_STATES = (
         (0, ''),
@@ -70,3 +67,11 @@ class SearchMemberForm(forms.Form):
     text = forms.CharField(label="", max_length=100, required=False)
     date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
     id_assembly = forms.IntegerField(widget=forms.widgets.HiddenInput(), required=False)
+
+class SearchVotesForm(forms.Form):
+    username = forms.CharField(label="username", max_length=100, required=False)
+    registration_number = forms.IntegerField(label="Registration number", required=False)
+    index_number = forms.IntegerField(label="Option index number", required=False)
+
+class SearchParticipationsForm(forms.Form):
+    username = forms.CharField(label="username", max_length=100, required=False)

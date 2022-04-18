@@ -22,10 +22,11 @@ urlpatterns = [
     path('votings/<int:voting_id>/delete', views.votings_delete, name='votings_delete'),
     path('votings/<int:voting_id>/schedule', views.votings_schedule, name='votings_schedule'),
     path('votings/<int:voting_id>/unschedule', views.votings_unschedule, name='votings_unschedule'),
+    path('votings/<int:voting_id>/votes', views.votes_search, name='votes_search'),
+    path('votings/<int:voting_id>/participations', views.participations_search, name='participations_search'),
 
     path('votings/<int:voting_id>/options/create', views.options_create, name='options_create'),
     path('votings/<int:voting_id>/options/<int:option_id>/edit', views.options_edit, name='options_edit'),
     path('votings/<int:voting_id>/options/<int:option_id>/delete', views.options_delete, name='options_delete'),
-    
     path('votings/<int:voting_id>/options/<int:option_id>/vote', views.votes_create, name='votes_create')
 ]
