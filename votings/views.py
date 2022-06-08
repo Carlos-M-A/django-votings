@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404
 from django.core.exceptions import PermissionDenied, BadRequest
 from django.db.models import Q
-from .models import Assembly, Membership, Option, Organization, Participation, Vote, Voting, VotingStates
+from .models import Assembly, Membership, Option, Organization, Participation, Vote, Voting, VotingStates, ParticipationTemporaryRecord
 from .forms import OptionForm, SearchVotingForm, VotingDatesForm, VotingForm, SearchMemberForm, SearchVotesForm, SearchParticipationsForm
 from django.contrib.auth.models import User
 
@@ -239,6 +239,11 @@ def votes_create(request, voting_id, option_id):
     voting = get_object_or_404(Voting, pk=voting_id)
     if option.voting.id != voting.id:
         raise Http404()
+    try:
+        participation = ParticipationTemporaryRecord.objects.get(voting=voting, user=request.user)
+    except ParticipationTemporaryRecord.DoesNotExist:
+        participation = None
+
     if option.voting.state != VotingStates.ACTIVE:
         raise PermissionDenied()
     
@@ -247,10 +252,10 @@ def votes_create(request, voting_id, option_id):
         vote.user = request.user
     vote.option = option
     vote.save()
-    participation = Participation()
+    participation = ParticipationTemporaryRecord()
     participation.user = request.user
     participation.voting = voting
-    participation.participation_check = True
+    participation.check = True
     participation.save()
 
     context = {

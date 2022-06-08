@@ -95,18 +95,29 @@ class Vote(models.Model):
 class Participation(models.Model):
     voting = models.ForeignKey(Voting, on_delete=models.RESTRICT)
     user = models.ForeignKey(User, on_delete=models.RESTRICT)
-    participation_check = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.user.id) + ': ' + str(self.participation_check)
+        return str(self.voting.id) + ': ' + str(self.user.id)
 
 
 class Tag(models.Model):
     name_text = models.CharField(max_length=128)
-    assembly = models.ForeignKey(Assembly, on_delete=models.RESTRICT)
     voting = models.ManyToManyField(Voting, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name_text
+
+
+class ParticipationTemporaryRecord(models.Model):
+    voting = models.ForeignKey(Voting, on_delete=models.RESTRICT)
+    user = models.ForeignKey(User, on_delete=models.RESTRICT)
+    check = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.voting.id) + ': ' + str(self.user.id)
+
+
+class PublicVotingRecord(models.Model):
+    voting = models.ForeignKey(Voting, on_delete=models.CASCADE)

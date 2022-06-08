@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Assembly, Membership, Organization, Participation, Tag, Voting, Option, Vote
+from .models import Assembly, Membership, Organization, Participation, Tag, Voting, Option, Vote, PublicVotingRecord
 from django.contrib.auth.models import User
 
 #admin.site.register(Voting)
@@ -21,3 +21,4 @@ admin.site.register(Tag)
 admin.site.register(Assembly)
 admin.site.register(Membership)
 admin.site.register(Organization)
+admin.site.register(PublicVotingRecord)
